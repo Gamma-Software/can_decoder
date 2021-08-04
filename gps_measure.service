@@ -1,0 +1,13 @@
+[Unit]
+Description=Connect and parse GPS measures and publish on mqtt server
+Requires=mosquitto.service
+After=mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/rudloff/sources/CapsuleScripts/devices_driver/gps/.venv/bin/python3 /home/rudloff/sources/CapsuleScripts/devices_driver/gps/gps_measure.py
+Restart=on-failure
+ 
+[Install]
+WantedBy=multi-user.target

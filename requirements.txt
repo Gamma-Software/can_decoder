@@ -1,0 +1,4 @@
+PyYAML==5.4.1
+pynmea2
+pyserial
+paho-mqtt==1.5.1
