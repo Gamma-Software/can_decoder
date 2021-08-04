@@ -1,0 +1,13 @@
+[Unit]
+Description=Decode CAN frames using OBD-II interface and python library
+Requires=mosquitto.service
+After=mosquitto.service
+Wants=mosquitto.service
+
+[Service]
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/rudloff/sources/CapsuleScripts/devices_driver/can/.venv/bin/python3 /home/rudloff/sources/CapsuleScripts/devices_driver/can/decode_can.py
+Restart=on-failure
+ 
+[Install]
+WantedBy=multi-user.target
