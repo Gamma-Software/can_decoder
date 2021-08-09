@@ -1,8 +1,8 @@
 [Unit]
 Description=Decode CAN frames using OBD-II interface and python library
-Requires=mosquitto.service
-After=mosquitto.service
-Wants=mosquitto.service
+Requires=docker.service
+After=docker.service
+Wants=docker.service
 
 [Service]
 ExecStartPre=/bin/sleep 10
