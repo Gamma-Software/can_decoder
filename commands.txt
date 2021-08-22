@@ -1,0 +1,72 @@
+6
+ISO 15765-4 (CAN 11/500)
+\.\COM5
+
+b'0211': DTC Throttle Position
+b'0621': Catalyst Monitor Bank 1
+b'0224': DTC 02 Sensor 1 WR Lambda Voltage
+b'0242': DTC Control module voltage
+b'0142': Control module voltage
+b'022D': DTC EGR Error
+b'0110': Air Flow Rate (MAF)
+b'0124': 02 Sensor 1 WR Lambda Voltage
+b'03': Get DTCs
+b'010F': Intake Air Temp
+b'0204': DTC Calculated Engine Load
+b'0111': Throttle Position
+b'022C': DTC Commanded EGR
+b'0140': Supported PIDs [41-60]
+b'014F': Various Max values
+b'0249': DTC Accelerator pedal position D
+b'020B': DTC Intake Manifold Pressure
+b'0600': Supported MIDs [01-20]
+b'020F': DTC Intake Air Temp
+b'0101': Status since DTCs cleared
+b'0210': DTC Air Flow Rate (MAF)
+b'0231': DTC Distance traveled since codes cleared
+b'0100': Supported PIDs [01-20]
+b'0205': DTC Engine Coolant Temperature
+b'024F': DTC Various Max values
+b'0105': Engine Coolant Temperature
+b'0620': Supported MIDs [21-40]
+b'012C': Commanded EGR
+b'0201': DTC Status since DTCs cleared
+b'0121': Distance Traveled with MIL on
+b'04': Clear DTCs and Freeze data
+b'0240': DTC Supported PIDs [41-60]
+b'020D': DTC Vehicle Speed
+b'014E': Time since trouble codes cleared
+b'021C': DTC OBD Standards Compliance
+b'0221': DTC Distance Traveled with MIL on
+b'ATI': ELM327 version string
+b'0233': DTC Barometric Pressure
+b'07': Get DTCs from the current/last driving cycle
+b'010C': Engine RPM
+b'0230': DTC Number of warm-ups since codes cleared
+b'0120': Supported PIDs [21-40]
+b'020C': DTC Engine RPM
+b'024A': DTC Accelerator pedal position E
+b'0133': Barometric Pressure
+b'0134': 02 Sensor 1 WR Lambda Current
+b'021F': DTC Engine Run Time
+b'010D': Vehicle Speed
+b'0123': Fuel Rail Pressure (direct inject)
+b'014C': Commanded throttle actuator
+b'0631': EGR Monitor Bank 1
+b'024E': DTC Time since trouble codes cleared
+b'0131': Distance traveled since codes cleared
+b'0149': Accelerator pedal position D
+b'010B': Intake Manifold Pressure
+b'011C': OBD Standards Compliance
+b'0104': Calculated Engine Load
+b'0220': DTC Supported PIDs [21-40]
+b'012D': EGR Error
+b'014A': Accelerator pedal position E
+b'014D': Time run with MIL on
+b'ATRV': Voltage detected by OBD-II adapter
+b'0130': Number of warm-ups since codes cleared
+b'011F': Engine Run Time
+b'024C': DTC Commanded throttle actuator
+b'0223': DTC Fuel Rail Pressure (direct inject)
+b'0234': DTC 02 Sensor 1 WR Lambda Current
+b'024D': DTC Time run with MIL on

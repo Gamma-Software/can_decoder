@@ -1,11 +1,11 @@
 debug: True
-mqtt:
+can_interface:
+  port: "\\.\\COM5"
+  baudrate: "38400"
+influxdb:
+  url: "localhost"
+  port: "8086"
   user: "user"
   pass: "pass"
-  host: "localhost"
-  port: 1884
-serial:
-  port: "/dev/ttyACM0"
-  timeout: 1.0 # in second
-  baud: 115200
+  database: "telegraf"
 period_s: 0.1
