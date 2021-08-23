@@ -53,61 +53,43 @@ obd.logger.addHandler(logging.FileHandler("/var/log/capsule/can_interface.log", 
 
 # First Dump ELM Version
 connection = obd.OBD(conf["can_interface"]["port"], conf["can_interface"]["baudrate"], start_low_power=False, fast=False)
-obd.logging(connection.query(obd.commands.ELM_VERSION).value)
+async_connection = obd.Async(conf["can_interface"]["port"], conf["can_interface"]["baudrate"], start_low_power=False, fast=False)
+obd.logging.info(connection.query(obd.commands.ELM_VERSION).value)
 
-# Wait for the vehicle to switch on but monitor Battery Voltage though
 try:
-    command = obd.commands.ELM_VOLTAGE
-    while connection.is_connected():
-        client.publish("process/can_interface/alive", True)
-        client.publish("can_interface/"+str(command), connection.query(command).value)
-except KeyboardInterrupt:
-    connection.close()
-    logging.info("Stop script")
-    sys.exit(0)
+    # ----------------------------------------------------------------------------------------------------------------------
+    # Main loop
+    # ----------------------------------------------------------------------------------------------------------------------
+    while True:
+        # Wait for the vehicle to switch on but monitor Battery Voltage though
+        try:
+            command = obd.commands.ELM_VOLTAGE
+            while not connection.is_connected():
+                client.publish("process/can_interface/alive", True)
+                client.publish("can_interface/"+str(command), connection.query(command).value)
+        except KeyboardInterrupt:
+            break
+        
+        obd.logging.info("The contact key is switched ON")
 
-
-# TODO
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Main loop
-# ----------------------------------------------------------------------------------------------------------------------
-try:
-    async_connection = obd.Async(conf["can_interface"]["port"], conf["can_interface"]["baudrate"], start_low_power=False, fast=False)
-
+        def value(r):
+            client.publish("can_interface/"+str(command), connection.query(command).value)
+        
+        try:
+            # Initiate all callbacks
+            for commands in list(connection.supported_commands):
+                async_connection.watch(commands.name, callback=value)
+                async_connection.start()
+            # keep monitoring until the car is switched off
+            while async_connection.is_connected() and async_connection.running:
+                client.publish("process/can_interface/alive", True)
+        except KeyboardInterrupt:
+            break
 except KeyboardInterrupt:
     pass
 
-logging.info("Stop script")
-sys.exit(0)
-
-exe
-# a callback that prints every new value to the console
-def new_rpm(r):
-    print(r.value)
-
-
-def value(r):
-    print(r.value)
-def watch_all_commands():
-    for commands in list(connection.supported_commands):
-        connection.watch(commands.name, callback=value)
-        connection.start()
-
-async_connection.watch(obd.commands.RPM, callback=new_rpm)
-async_connection.start()
-
-# the callback will now be fired upon receipt of new values
-
-time.sleep(60)
-async_connection.stop()
-
-
-exit(0)
-while True and connection.is_connected():
-    cmd = obd.commands.RPM # select an OBD command (sensor)
-    response = connection.query(cmd) # send the command, and parse the response
-    print(response.value) # returns unit-bearing values thanks to Pint
-    time.sleep(1)
-
 connection.close()
+async_connection.close()
+obd.logging.info("Stop script")
+client.publish("process/can_interface/alive", False)
+sys.exit(0)
