@@ -72,13 +72,13 @@ try:
         
         obd.logging.info("The contact key is switched ON")
 
-        def value(r):
-            client.publish("can_interface/"+str(command), connection.query(command).value)
+        def publish_command_result(c, r):
+            client.publish("can_interface/"+str(c), r)
         
         try:
             # Initiate all callbacks
             for commands in list(connection.supported_commands):
-                async_connection.watch(commands.name, callback=value)
+                async_connection.watch(commands.name, callback=publish_command_result)
                 async_connection.start()
             # keep monitoring until the car is switched off
             while async_connection.is_connected() and async_connection.running:
