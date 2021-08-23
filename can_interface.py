@@ -83,6 +83,7 @@ try:
             # keep monitoring until the car is switched off
             while async_connection.is_connected() and async_connection.running:
                 client.publish("process/can_interface/alive", True)
+                time.sleep(conf["period_s"])
         except KeyboardInterrupt:
             break
 except KeyboardInterrupt:
