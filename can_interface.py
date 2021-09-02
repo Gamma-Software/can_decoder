@@ -67,6 +67,7 @@ try:
             while not connection.is_connected():
                 client.publish("process/can_interface/alive", True)
                 client.publish("can_interface/"+str(command), connection.query(command).value)
+                time.sleep(2) # No need to rush
         except KeyboardInterrupt:
             break
         
