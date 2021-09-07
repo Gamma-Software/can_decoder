@@ -2,9 +2,14 @@ debug: True
 can_interface:
   port: "\\.\\COM5"
   baudrate: "38400"
+mqtt:
+  user: "user"
+  pass: "pass"
+  host: "localhost"
+  port: 1884
 influxdb:
   url: "localhost"
-  port: "8086"
+  port: 8086
   user: "user"
   pass: "pass"
   database: "telegraf"

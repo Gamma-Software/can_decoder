@@ -19,8 +19,12 @@ Change default user and pass config in /etc/capsule/can_decoder/config.yaml
 We assume that the script will only be run on Linux OS
 TODO
 
-# Mosquitto publish topics
+## Mosquitto publish topics
 process/can_decoder/alive
 can_decoder/speed
 can_decoder/rpm
 can_decoder/motor_temperature
+
+## Docker
+You can start the script with Docker with the command:
+docker run -v path/to/config.yaml:/etc/capsule/can_interface/config.yaml:ro --privileged -p 1884:1884 -p 8086:8086 can_decoder
