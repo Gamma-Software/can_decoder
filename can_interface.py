@@ -66,7 +66,7 @@ try:
             command = obd.commands.ELM_VOLTAGE
             while not connection.is_connected():
                 client.publish("process/can_decoder/alive", True)
-                client.publish("can_decoder/"+str(command), connection.query(command).value)
+                client.publish("can_decoder/"+str(command), float(str(connection.query(command).value).strip(" volt")))
                 time.sleep(2) # No need to rush
         except KeyboardInterrupt:
             break
