@@ -16,7 +16,7 @@ import obd
 # ----------------------------------------------------------------------------------------------------------------------
 # Read script parameters
 # ----------------------------------------------------------------------------------------------------------------------
-path_to_conf = os.path.join("/etc/capsule/can_interface/config.yaml")
+path_to_conf = os.path.join("/etc/capsule/can_decoder/config.yaml")
 # If the default configuration is not install, then configure w/ the default one
 if not os.path.exists(path_to_conf):
     sys.exit("Configuration file %s does not exists. Please reinstall the app" % path_to_conf)
@@ -49,11 +49,11 @@ while not client.is_connected():
 # ----------------------------------------------------------------------------------------------------------------------
 connected = False
 obd.logger.setLevel(obd.logging.DEBUG if conf["debug"] else obd.logging.INFO) # enables all debug information
-obd.logger.addHandler(logging.FileHandler("/var/log/capsule/can_interface.log", "a"))
+obd.logger.addHandler(logging.FileHandler("/var/log/capsule/can_decoder.log", "a"))
 
 # First Dump ELM Version
-connection = obd.OBD(conf["can_interface"]["port"], conf["can_interface"]["baudrate"], start_low_power=False, fast=False)
-async_connection = obd.Async(conf["can_interface"]["port"], conf["can_interface"]["baudrate"], start_low_power=False, fast=False)
+connection = obd.OBD(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], start_low_power=False, fast=False)
+async_connection = obd.Async(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], start_low_power=False, fast=False)
 obd.logging.info(connection.query(obd.commands.ELM_VERSION).value)
 
 try:
@@ -65,8 +65,8 @@ try:
         try:
             command = obd.commands.ELM_VOLTAGE
             while not connection.is_connected():
-                client.publish("process/can_interface/alive", True)
-                client.publish("can_interface/"+str(command), connection.query(command).value)
+                client.publish("process/can_decoder/alive", True)
+                client.publish("can_decoder/"+str(command), connection.query(command).value)
                 time.sleep(2) # No need to rush
         except KeyboardInterrupt:
             break
@@ -74,7 +74,7 @@ try:
         obd.logging.info("The contact key is switched ON")
 
         def publish_command_result(c, r):
-            client.publish("can_interface/"+str(c), r)
+            client.publish("can_decoder/"+str(c), r)
         
         try:
             # Initiate all callbacks
@@ -83,7 +83,7 @@ try:
                 async_connection.start()
             # keep monitoring until the car is switched off
             while async_connection.is_connected() and async_connection.running:
-                client.publish("process/can_interface/alive", True)
+                client.publish("process/can_decoder/alive", True)
                 time.sleep(conf["period_s"])
         except KeyboardInterrupt:
             break
@@ -93,5 +93,5 @@ except KeyboardInterrupt:
 connection.close()
 async_connection.close()
 obd.logging.info("Stop script")
-client.publish("process/can_interface/alive", False)
+client.publish("process/can_decoder/alive", False)
 sys.exit(0)
