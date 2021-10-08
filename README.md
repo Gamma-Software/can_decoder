@@ -1,29 +1,19 @@
 *Date of creation: 04/08/2021*
 
 # Can decoder
-Decode CAN frame of the Capsule car (Toyota Hilux) via OBD-II interface and a python library
-
-## Requirements
-python-can
-paho
-pyyaml
+Decode CAN frame of the Capsule car (Toyota Hilux) via OBD-II interface
 
 # Installation
-Create a python virtual environnement: 'virtualenv .venv"
-Install requirements 'pip install -r requirements.txt'
-Install the configurations and service and udev rule 'python3 (from the virtualenv) install.py'
-Change default user and pass config in /etc/capsule/can_decoder/config.yaml
+1. Create a python virtual environnement: 'virtualenv .venv" and activate it
+2. Install requirements 'pip install -r requirements.txt'
+3. Install the configurations and service and udev rule (from the virtualenv) 'python3 install.py'
+4. Change default user and pass config in /etc/capsule/can_decoder/config.yaml
 
-## Details
-### Integration
-We assume that the script will only be run on Linux OS
-TODO
-
-## Mosquitto publish topics
-process/can_decoder/alive
-can_decoder/speed
-can_decoder/rpm
-can_decoder/motor_temperature
+# Details
+## Integration
+* This project is tested and developed to be used on a Toyota Hilux.\
+* To make it work you should by a OBD-II adapter. Tested on a bluetooth adapter but via USB it should work.\
+* To share the data we use the Mosquito framework
 
 ## Docker
 You can start the script with Docker with the command:
