@@ -7,7 +7,7 @@ Wants=docker.service
 [Service]
 ExecStartPre=/bin/sleep 10
 ExecStart=/home/rudloff/sources/CapsuleScripts/devices_driver/can_decoder/.venv/bin/python3 /home/rudloff/sources/CapsuleScripts/devices_driver/can_decoder/decode_can.py
-Restart=on-failure
+Restart=always
  
 [Install]
 WantedBy=multi-user.target
