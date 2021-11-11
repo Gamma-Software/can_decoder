@@ -11,6 +11,7 @@ import time
 import logging
 import datetime
 import obd
+from obd import OBDStatus
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -52,46 +53,78 @@ obd.logger.setLevel(obd.logging.DEBUG if conf["debug"] else obd.logging.INFO) # 
 obd.logger.addHandler(logging.FileHandler("/var/log/capsule/can_decoder.log", "a"))
 
 # First Dump ELM Version
-connection = obd.OBD(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], start_low_power=False, fast=False)
-async_connection = obd.Async(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], start_low_power=False, fast=False)
+connection = obd.OBD(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], check_voltage=False, start_low_power=False, fast=False)
 obd.logging.info(connection.query(obd.commands.ELM_VERSION).value)
+
+# Get wanted commands
+wanted_commands = {}
+with open("wanted_commands.txt") as f:
+    lines = f.readlines()
+    for i, r in enumerate(lines): 
+        wanted_commands[r.strip("\n").split(",")[0]] = r.strip("\n").split(",")[1]
 
 try:
     # ----------------------------------------------------------------------------------------------------------------------
     # Main loop
     # ----------------------------------------------------------------------------------------------------------------------
-    while True:
-        # Wait for the vehicle to switch on but monitor Battery Voltage though
+    # Wait for the vehicle to switch on but monitor Battery Voltage though
+    command = obd.commands.ELM_VOLTAGE
+    response = connection.query(command) # This prevented from receiving None at first query (idk why)
+    voltage = 0.0
+    while voltage < 13.5:
+        client.publish("process/can_decoder/alive", True)
+        response = connection.query(command)
         try:
-            command = obd.commands.ELM_VOLTAGE
-            while not connection.is_connected():
-                client.publish("process/can_decoder/alive", True)
-                client.publish("can_decoder/"+str(command), float(str(connection.query(command).value).strip(" volt")))
-                time.sleep(2) # No need to rush
-        except KeyboardInterrupt:
+            voltage = response.value.magnitude
+            client.publish("can_decoder/"+str(command.name), voltage)
+        except ValueError as e:
+            print("Error in result command / ", e)
             break
-        
-        obd.logging.info("The contact key is switched ON")
+        except AttributeError as e:
+            print("Error in result command / ", e)
+            break
+        time.sleep(2) # No need to rush
 
-        def publish_command_result(c, r):
-            client.publish("can_decoder/"+str(c), r)
-        
+    obd.logging.info("The contact key is switched ON and the engine started, wait 2 seconds to connect")
+    connection.close() # Close initial connection
+    time.sleep(2)
+    connection = obd.Async(conf["can_decoder"]["port"], conf["can_decoder"]["baudrate"], check_voltage=False, start_low_power=False, fast=False)
+    def publish_command_result(c, r):
+        if c.name == "ELM_VOLTAGE" and r.value.magnitude < 13.0:
+            connection.close()
+            obd.logging.info("Stop script")
+            client.publish("process/can_decoder/alive", False)
+            sys.exit(0)
+
         try:
-            # Initiate all callbacks
-            for commands in list(connection.supported_commands):
-                async_connection.watch(commands.name, callback=publish_command_result)
-                async_connection.start()
+            # Expose value (striped of its unit) through mqtt network 
+            client.publish("can_decoder/"+str(c.name), r.value.magnitude)
+        except ValueError as e:
+            print("Error in result command / ", e)
+            pass
+        except AttributeError as e:
+            print("Error in result command / ", e)
+            pass
+
+    while True:
+        # Initiate all callbacks if supported and wanted
+        for supported_command in list(connection.supported_commands):
+            if supported_command.name in list(wanted_commands.keys()):
+                connection.watch(supported_command, callback=publish_command_result)
+        connection.start()
+        try:
             # keep monitoring until the car is switched off
-            while async_connection.is_connected() and async_connection.running:
+            while connection.is_connected() and connection.running:
                 client.publish("process/can_decoder/alive", True)
                 time.sleep(conf["period_s"])
         except KeyboardInterrupt:
             break
+        connection.stop()
+        connection.unwatch_all()
 except KeyboardInterrupt:
     pass
 
 connection.close()
-async_connection.close()
 obd.logging.info("Stop script")
 client.publish("process/can_decoder/alive", False)
 sys.exit(0)
