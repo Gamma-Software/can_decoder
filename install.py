@@ -5,8 +5,7 @@ import shutil
 
 print("Configuring can_decoder app...")
 path_to_app = "/etc/capsule/can_decoder"
-path_to_log = "/var/log/capsule/can_decoder"
-path_to_conf = "/etc/capsule/can_decoder/config.yaml"
+path_to_log = "/var/log/capsule"
 path_to_conf = "/etc/capsule/can_decoder/config.yaml"
 path_to_services = "/etc/systemd/system/can_decoder.service"
 if not os.path.exists(path_to_app):
@@ -27,6 +26,6 @@ if not os.path.exists(path_to_conf):
 if not os.path.exists(path_to_services):
     print("Create can_decoder service")
     shutil.copy2(os.path.join(os.path.dirname(__file__), "can_decoder.service"), path_to_services)
-    os.chmod(path_to_services, 0o775) # Give all read access but Rudloff write access
+    os.chmod(path_to_services, 0o644) # Give all read access but Rudloff write access
     os.system("systemctl daemon-reload")
     os.system("systemctl enable can_decoder.service")
